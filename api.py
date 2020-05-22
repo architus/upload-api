@@ -16,7 +16,7 @@ def upload():
 
     event = request.args.get('event')
     event_id = request.args.get('event_id')
-    if not (event and event == 'pr' or event == 'commit'):
+    if not (event and (event == 'pr' or event == 'commit')):
         return {'message': "missing type"}, 400
     if not event_id:
         return {'message': "missing event_id"}, 400
@@ -30,7 +30,7 @@ def upload():
         tarball.write(chunk)
 
     try:
-        build = tarfile.open(fileobj=tarball)
+        build = tarfile.open(fileobj=tarball, mode="r:gz")
     except tarfile.ReadError as e:
         print(e)
         return {'message': "not a tarfile"}, 400
