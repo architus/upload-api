@@ -2,12 +2,18 @@ from flask import Flask, request
 from pathlib import Path
 from io import BytesIO
 import tarfile
+import os
 
 app = Flask(__name__)
+key = os.environ['UPLOAD_API_KEY']
 
 
 @app.route('/api/upload', methods=['POST'])
 def upload():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or auth_header != key:
+        return {'message': "not authorized"}, 401
+
     event = request.args.get('event')
     event_id = request.args.get('event_id')
     if not (event and event == 'pr' or event == 'commit'):
