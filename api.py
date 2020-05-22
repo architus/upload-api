@@ -11,7 +11,7 @@ key = os.environ['UPLOAD_API_KEY']
 @app.route('/api/upload', methods=['POST'])
 def upload():
     auth_header = request.headers.get('Authorization')
-    if not auth_header or auth_header != key:
+    if not auth_header or auth_header != f"Bearer {key}":
         return {'message': "not authorized"}, 401
 
     event = request.args.get('event')
