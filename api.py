@@ -4,6 +4,7 @@ from io import BytesIO
 import tarfile
 import os
 import errno
+import sys
 
 app = Flask(__name__)
 key = os.environ['UPLOAD_API_KEY']
@@ -24,9 +25,9 @@ def upload():
     if not event_id:
         return {'message': "missing event_id"}, 400
     if event == 'pr' and not event_id.isdecimal():
-        return {'message': f'invalid event_id for pr {event_id}'}
+        return {'message': f'invalid event_id for pr {event_id}'}, 400
     if event == 'commit' and len(event_id) != 7:
-        return {'message': f'invalid event_id for commit {event_id}'}
+        return {'message': f'invalid event_id for commit {event_id}'}, 400
 
     # validate namespace
     namespace = request.args.get('namespace')
@@ -37,9 +38,11 @@ def upload():
         sanitized = namespace.replace(r"\.+", ".")
 
         # normalize namespace to construct base path
-        base_path = f'/{sanitized.strip('/')}/'
-        if base_path.startswith('/pr/') or base_path.startswith('/commit/'):
-            return {'message': "invalid namespace supplied"}
+        base_path = f'/{sanitized.strip("/")}/'
+        if (base_path.startswith('/pr/')
+            or base_path.startswith('/commit/')
+            or base_path.startswith('/api/')):
+            return {'message': "invalid namespace supplied"}, 400
 
     tarball = BytesIO()
     while True:
