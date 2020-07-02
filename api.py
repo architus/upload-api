@@ -58,49 +58,14 @@ def upload():
         print(e)
         return {'message': "not a tarfile"}, 400
 
-    # make sure path is valid
     target_path = f"{base_path}{event}/{event_id}"
     disk_path = f"www{target_path}"
-    if not is_pathname_valid(disk_path):
-        return {'message': f'invalid path "{target_path}"'}, 400
-
     Path(disk_path).mkdir(parents=True, exist_ok=True)
     build.extractall(disk_path)
     return {
         'path': target_path,
         'url': f"https://staging.archit.us{target_path}"
     }, 200
-
-
-# from https://stackoverflow.com/a/34102855/13192375
-def is_pathname_valid(pathname: str) -> bool:
-    '''
-    `True` if the passed pathname is a valid pathname for the current OS;
-    `False` otherwise.
-    '''
-    
-    ERROR_INVALID_NAME = 123
-    try:
-        if not isinstance(pathname, str) or not pathname:
-            return False
-        _, pathname = os.path.splitdrive(pathname)
-        root_dirname = os.environ.get('HOMEDRIVE', 'C:') \
-            if sys.platform == 'win32' else os.path.sep
-        assert os.path.isdir(root_dirname)
-        root_dirname = root_dirname.rstrip(os.path.sep) + os.path.sep
-        for pathname_part in pathname.split(os.path.sep):
-            try:
-                os.lstat(root_dirname + pathname_part)
-            except OSError as exc:
-                if hasattr(exc, 'winerror'):
-                    if exc.winerror == ERROR_INVALID_NAME:
-                        return False
-                elif exc.errno in {errno.ENAMETOOLONG, errno.ERANGE}:
-                    return False
-    except TypeError as exc:
-        return False
-    else:
-        return True
 
 
 if __name__ == '__main__':
