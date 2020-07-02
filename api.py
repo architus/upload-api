@@ -62,7 +62,7 @@ def upload():
     target_path = f"{base_path}{event}/{event_id}"
     disk_path = f"www{target_path}"
     if not is_pathname_valid(disk_path):
-        return {'message': f'invalid path "{target_path}"'}
+        return {'message': f'invalid path "{target_path}"'}, 400
 
     Path(disk_path).mkdir(parents=True, exist_ok=True)
     build.extractall(disk_path)
