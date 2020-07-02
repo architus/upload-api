@@ -3,8 +3,6 @@ from pathlib import Path
 from io import BytesIO
 import tarfile
 import os
-import errno
-import sys
 
 app = Flask(__name__)
 key = os.environ['UPLOAD_API_KEY']
